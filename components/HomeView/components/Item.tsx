@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useStore } from "@/stores/Store";
 
-export const Item = ({ item, handleDeleteItem }) => {
+export const Item = ({ item }) => {
+  const { removeStoreItem } = useStore();
   return (
     <View style={styles.item}>
       <View style={styles.itemDetails}>
@@ -14,7 +16,7 @@ export const Item = ({ item, handleDeleteItem }) => {
       </View>
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={() => handleDeleteItem(item.id)}
+        onPress={() => removeStoreItem(item.id)}
       >
         <Text style={styles.deleteButtonText}>Usuń</Text>
       </TouchableOpacity>

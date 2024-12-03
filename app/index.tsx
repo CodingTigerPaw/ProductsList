@@ -1,4 +1,4 @@
-import HomeView from "@/components/HomeView";
+import HomeView from "@/components/HomeView/HomeView";
 import { Text, View } from "react-native";
 
 export default function Index() {

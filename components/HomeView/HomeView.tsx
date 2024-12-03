@@ -7,39 +7,34 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { Item } from "./Item";
+import { Item } from "./components/Item";
 
-import { saveData, loadData } from "../utils/Storage";
-
+import { useStore } from "@/stores/Store";
+import { Link } from "expo-router";
 const HomeView = () => {
-  const [items, setItems] = useState([]); // Tablica obiektów
   const [item, setItem] = useState({
     name: "",
     brand: "",
     type: "Type 1",
     count: "",
-  }); // Obiekt przechowujący dane pojedynczego produktu
+  });
 
-  const STORAGE_KEY = "itemsList";
+  const { setStore, itemsStore, addStoreItem } = useStore(); // Obiekt przechowujący dane pojedynczego produktu
 
   // Odczyt danych przy pierwszym uruchomieniu
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchItems = () => {
       try {
-        const storedItems = await loadData(STORAGE_KEY);
-        setItems(storedItems);
+        setStore();
       } catch (e) {
         console.error(e.message);
       }
     };
-
     fetchItems();
   }, []);
 
-  // Obsługa zmiany wartości w obiekcie diaper
   const handleChange = (key, value) => {
     setItem((prevState) => ({
       ...prevState,
@@ -51,47 +46,19 @@ const HomeView = () => {
   const handleAddItem = async () => {
     const { name, brand, type, count } = item;
 
-    if (
-      name.trim() === "" ||
-      brand.trim() === "" ||
-      count.trim() === "" ||
-      isNaN(count)
-    ) {
-      alert("Proszę wypełnić wszystkie pola poprawnie.");
-      return;
-    }
-
     const newItem = {
       id: Date.now().toString(),
       name,
       brand,
       type,
-      count: parseInt(count, 10),
+      count,
     };
-
-    const updatedItems = [...items, newItem];
-
     try {
-      await saveData(STORAGE_KEY, updatedItems);
-      setItems(updatedItems);
-      setItem({ name: "", brand: "", type: "Medical", count: "" });
+      addStoreItem(newItem);
     } catch (e) {
       console.error(e.message);
     }
   };
-
-  // Usuwanie elementu
-  const handleDeleteItem = async (id) => {
-    const updatedItems = items.filter((item) => item.id !== id);
-
-    try {
-      await saveData(STORAGE_KEY, updatedItems);
-      setItems(updatedItems);
-    } catch (e) {
-      console.error(e.message);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Zarządzanie produktami</Text>
@@ -123,12 +90,11 @@ const HomeView = () => {
         onChangeText={(value) => handleChange("count", value)}
       />
       <Button title="Dodaj produkt" onPress={handleAddItem} />
+      <Link href="/form">link</Link>
       <FlatList
-        data={items}
+        data={itemsStore}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Item item={item} handleDeleteItem={handleDeleteItem} />
-        )}
+        renderItem={({ item }) => <Item item={item} />}
         style={styles.list}
       />
     </SafeAreaView>
