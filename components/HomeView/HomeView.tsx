@@ -13,6 +13,7 @@ import { Item } from "./components/Item";
 
 import { useStore } from "@/stores/Store";
 import { Link } from "expo-router";
+import { Form } from "../Form";
 const HomeView = () => {
   const [item, setItem] = useState({
     name: "",
@@ -62,7 +63,7 @@ const HomeView = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Zarządzanie produktami</Text>
-      <TextInput
+      {/* <TextInput
         style={styles.input}
         placeholder="Nazwa"
         value={item.name}
@@ -89,7 +90,8 @@ const HomeView = () => {
         keyboardType="numeric"
         onChangeText={(value) => handleChange("count", value)}
       />
-      <Button title="Dodaj produkt" onPress={handleAddItem} />
+      <Button title="Dodaj produkt" onPress={handleAddItem} /> */}
+      <Form />
       <Link href="/form">link</Link>
       <FlatList
         data={itemsStore}
