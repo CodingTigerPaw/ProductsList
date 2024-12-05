@@ -4,10 +4,28 @@ import { Picker } from "@react-native-picker/picker";
 import { useStore } from "@/stores/Store";
 import { itemSchema } from "@/schemas/ItemSchema";
 import { withZodSchema } from "formik-validator-zod";
+import { styles } from "./styles";
+
+type itemType = {
+  name: string;
+  brand: string;
+  type: string;
+  count: number;
+};
 
 export const Form = () => {
   const { addStoreItem } = useStore();
-  const handleAddItem = async ({ name, brand, type, count }) => {
+
+  const parseAndHandleChange = (
+    value: string,
+    setFieldValue: any,
+    id: string
+  ) => {
+    const parsed = isNaN(parseInt(value, 10)) ? "" : parseInt(value, 10);
+    setFieldValue(id, parsed);
+  };
+
+  const handleAddItem = async ({ name, brand, type, count }: itemType) => {
     const newItem = {
       id: Date.now().toString(),
       name,
@@ -28,14 +46,21 @@ export const Form = () => {
         name: "",
         brand: "",
         type: "Type 1",
-        count: "",
+        count: 0,
       }}
-      //   validate={withZodSchema(itemSchema)}
       onSubmit={(values) => {
         handleAddItem(values);
       }}
+      validate={withZodSchema(itemSchema)}
     >
-      {({ handleChange, values, errors, touched, handleSubmit }) => (
+      {({
+        handleChange,
+        values,
+        setFieldValue,
+        errors,
+        touched,
+        handleSubmit,
+      }) => (
         <View>
           <TextInput
             style={styles.input}
@@ -43,12 +68,15 @@ export const Form = () => {
             value={values.name}
             onChangeText={handleChange("name")}
           />
+          {errors.name && touched.name && <Text>{errors.name}</Text>}
           <TextInput
             style={styles.input}
             placeholder="Marka"
             value={values.brand}
             onChangeText={handleChange("brand")}
           />
+          {errors.brand && touched.brand && <Text>{errors.brand}</Text>}
+
           <Picker
             selectedValue={values.type}
             style={styles.input}
@@ -62,22 +90,21 @@ export const Form = () => {
             placeholder="Liczba sztuk"
             value={values.count}
             keyboardType="numeric"
-            onChangeText={handleChange("count")}
+            onChangeText={(data) =>
+              parseAndHandleChange(data, setFieldValue, "count")
+            }
           />
-          <Button title="Dodaj produkt" onPress={handleSubmit} />
+          {errors.count && touched.count && <Text>{errors.count}</Text>}
+
+          <Button
+            title="Dodaj produkt"
+            onPress={() => {
+              console.log(errors);
+              handleSubmit();
+            }}
+          />
         </View>
       )}
     </Formik>
   );
 };
-
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-  },
-});
