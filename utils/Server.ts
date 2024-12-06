@@ -1,8 +1,9 @@
 import axios from "axios";
 
-export const getData = async (url: string) => {
+axios.defaults.baseURL = "http://localhost:3000/items";
+export const getData = async () => {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get("");
     console.log(response.data);
     return response.data;
   } catch (e) {
@@ -10,17 +11,25 @@ export const getData = async (url: string) => {
   }
 };
 
-export const postData = async (url: string, data) => {
+export const postData = async (data) => {
   try {
-    axios.post(url, data);
+    await axios.post("", data);
   } catch (e) {
     console.log(e.message);
   }
 };
 
-export const deleteData = async (url: string, id: string) => {
+export const deleteData = async (id: string) => {
   try {
-    axios.delete(`${url}/${id}`);
+    await axios.delete(`/${id}`);
+  } catch (e) {
+    console.log(e.message);
+  }
+};
+
+export const patchData = async (id: string, data) => {
+  try {
+    await axios.patch(`/${id}`, data);
   } catch (e) {
     console.log(e.message);
   }

@@ -5,7 +5,7 @@ import { useStore } from "@/stores/Store";
 import { itemSchema } from "@/schemas/ItemSchema";
 import { withZodSchema } from "formik-validator-zod";
 import { styles } from "./styles";
-
+import { useRouter } from "expo-router";
 type itemType = {
   name: string;
   brand: string;
@@ -13,8 +13,9 @@ type itemType = {
   count: number;
 };
 
-export const Form = () => {
-  const { addStoreItem } = useStore();
+export const Form = ({ item }) => {
+  const { addStoreItem, patchStoreItem } = useStore();
+  const router = useRouter();
 
   const parseAndHandleChange = (
     value: string,
@@ -26,15 +27,19 @@ export const Form = () => {
   };
 
   const handleAddItem = async ({ name, brand, type, count }: itemType) => {
+    const handePatch = () => {
+      patchStoreItem(item.id, newItem);
+      router.back();
+    };
     const newItem = {
-      id: Date.now().toString(),
+      id: item.id ? item.id : Date.now().toString(),
       name,
       brand,
       type,
       count,
     };
     try {
-      addStoreItem(newItem);
+      item ? handePatch() : addStoreItem(newItem);
     } catch (e) {
       console.error(e.message);
     }
@@ -43,10 +48,10 @@ export const Form = () => {
   return (
     <Formik
       initialValues={{
-        name: "",
-        brand: "",
-        type: "Type 1",
-        count: 0,
+        name: item?.name || "",
+        brand: item?.brand || "",
+        type: item?.type || "Type 1",
+        count: parseInt(item?.count) || 0,
       }}
       onSubmit={(values) => {
         handleAddItem(values);
@@ -97,9 +102,8 @@ export const Form = () => {
           {errors.count && touched.count && <Text>{errors.count}</Text>}
 
           <Button
-            title="Dodaj produkt"
+            title={item ? "Zapisz zmiany" : "Dodaj produkt"}
             onPress={() => {
-              console.log(errors);
               handleSubmit();
             }}
           />

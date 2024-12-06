@@ -9,7 +9,6 @@ export const saveData = async (key, value) => {
   }
 };
 
-// Funkcja odczytująca tablicę obiektów
 export const loadData = async (key) => {
   try {
     const value = await AsyncStorage.getItem(key);
